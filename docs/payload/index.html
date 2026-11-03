@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script>
+    document.documentElement.classList.add('tosi-js')
+    document.addEventListener('click', function (e) {
+      if (customElements.get('tosi-doc-system')) return
+      var b = e.target.closest && e.target.closest('.doc-nav .nav-toggle')
+      if (!b) return
+      var open = b.closest('.nav-branch').classList.toggle('-open')
+      b.setAttribute('aria-expanded', String(open))
+    })
+    try {
+      var p = JSON.parse(localStorage.getItem('tosi-doc-system-prefs') || '{}')
+      var t = p.theme || 'system'
+      if (t === 'dark' || (t === 'system' && matchMedia('(prefers-color-scheme: dark)').matches))
+        document.documentElement.classList.add('darkmode')
+      if (p.highContrast) document.documentElement.classList.add('high-contrast')
+    } catch (e) {}
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="../doc-system.css?v=9e86a918ede0" data-tosi-doc-system />
+  <title>payload — tosi-svg-gltf</title>
+  <meta name="description" content="The wire format, as code. An image in a glTF file carries its SVG in images[i].extras.tosi_svg" />
+  <link rel="alternate" type="text/markdown" href="index.md" title="payload — tosi-svg-gltf (markdown)" />
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="tosi-svg-gltf" />
+  <meta property="og:title" content="payload — tosi-svg-gltf" />
+  <meta property="og:description" content="The wire format, as code. An image in a glTF file carries its SVG in images[i].extras.tosi_svg" />
+  <meta name="twitter:card" content="summary" />
+  <link rel="icon" href="../favicon.svg" />
+</head>
+<body>
+  <tosi-doc-system docs="../docs.json?v=fef577d4399c" config="{&quot;projectName&quot;:&quot;tosi-svg-gltf&quot;,&quot;projectLinks&quot;:{&quot;tosijs&quot;:&quot;https://tosijs.net&quot;,&quot;github&quot;:&quot;https://github.com/tonioloewald/tosi-svg-gltf&quot;},&quot;ebooks&quot;:[]}">
+  <article class="doc-content" data-doc="payload.ts">
+<h1 id="payload">payload</h1>
+<p>The wire format, as code. An image in a glTF file carries its SVG in
+<code>images[i].extras.tosi_svg</code>:</p>
+<pre><code class="language-json" data-highlighted><span class="token punctuation">{</span>
+  <span class="token property">"uri or bufferView"</span><span class="token operator">:</span> <span class="token string">"a small PNG placeholder (valid glTF for any viewer)"</span><span class="token punctuation">,</span>
+  <span class="token property">"mimeType"</span><span class="token operator">:</span> <span class="token string">"image/png"</span><span class="token punctuation">,</span>
+  <span class="token property">"extras"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+    <span class="token property">"tosi_svg"</span><span class="token operator">:</span> <span class="token punctuation">{</span> <span class="token property">"version"</span><span class="token operator">:</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token property">"svg"</span><span class="token operator">:</span> <span class="token string">"&lt;svg …>…&lt;/svg>"</span><span class="token punctuation">,</span> <span class="token property">"width"</span><span class="token operator">:</span> <span class="token number">1024</span><span class="token punctuation">,</span> <span class="token property">"height"</span><span class="token operator">:</span> <span class="token number">512</span> <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p><code>width</code> × <code>height</code> is the size the author rasterized it at in Blender: the
+<strong>authored resolution</strong>, and the aspect ratio of the texture. A viewer may
+draw it larger or smaller, but keeps that aspect ratio, because the UVs were
+laid out against it. <a href="/format/">the format</a> is the full specification.</p>
+<p><code>readSvgPayload(image)</code> returns the payload or <code>null</code>. It never throws: a
+malformed payload is treated as absent, so the image&#39;s placeholder loads as
+an ordinary bitmap and the model still opens.</p>
+<pre><code class="language-test">import { readSvgPayload } from &#39;tosi-svg-gltf&#39;
+
+const image = { extras: { tosi_svg: { version: 1, svg: &#39;&lt;svg/&gt;&#39;, width: 64, height: 32 } } }
+test(&#39;a valid payload is returned&#39;, () =&gt; {
+  expect(readSvgPayload(image).width).toBe(64)
+})
+test(&#39;a missing one is null&#39;, () =&gt; {
+  expect(readSvgPayload({})).toBe(null)
+})
+</code></pre>
+
+  </article>
+  <nav class="doc-nav" aria-label="Documentation">
+  <ul>
+    <li><a class="doc-link" href="../">tosi-svg-gltf</a></li>
+    <li><a class="doc-link" href="../blender/">Blender add-on</a></li>
+    <li><a class="doc-link current" href="../payload/" aria-current="page">payload</a></li>
+    <li><a class="doc-link" href="../size-svg/">size-svg</a></li>
+    <li><a class="doc-link" href="../hydrate/">hydrate</a></li>
+    <li><a class="doc-link" href="../babylon/">babylon</a></li>
+    <li><a class="doc-link" href="../format/">The format</a></li>
+    <li><a class="doc-link" href="../CHANGELOG/">Changelog</a></li>
+  </ul>
+  </nav>
+  <ul class="doc-navbar">
+    <li><a href="/blender/" data-icon="download">Blender add-on</a></li>
+    <li><a href="https://3d.tosijs.net" data-icon="tosiXr">tosijs-3d</a></li>
+    <li><a href="https://github.com/tonioloewald/tosi-svg-gltf" data-icon="github">github</a></li>
+  </ul>
+  </tosi-doc-system>
+  <script type="module" src="../hydrate-9g3hpszc.js"></script>
+</body>
+</html>

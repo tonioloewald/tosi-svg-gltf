@@ -1,0 +1,5 @@
+import{_}from"./site-t1bgw9ek.js";class D{}D.POINTERDOWN=1;D.POINTERUP=2;D.POINTERMOVE=4;D.POINTERWHEEL=8;D.POINTERPICK=16;D.POINTERTAP=32;D.POINTERDOUBLETAP=64;class $v{constructor(s,t){this.type=s,this.event=t}}class Id extends $v{constructor(s,t,i,e){super(s,t);this.ray=null,this.originalPickingInfo=null,this.skipOnPointerObservable=!1,this.localPosition=new _(i,e)}}class zs extends $v{get pickInfo(){if(!this._pickInfo)this._generatePickInfo();return this._pickInfo}constructor(s,t,i,e=null){super(s,t);this._pickInfo=i,this._inputManager=e}_generatePickInfo(){if(this._inputManager)this._pickInfo=this._inputManager._pickMove(this.event),this._inputManager._setRayOnPointerInfo(this._pickInfo,this.event),this._inputManager=null}}class Ir{}Ir.KEYDOWN=1;Ir.KEYUP=2;class iu{constructor(s,t){this.type=s,this.event=t}}class ph extends iu{get skipOnPointerObservable(){return this.skipOnKeyboardObservable}set skipOnPointerObservable(s){this.skipOnKeyboardObservable=s}constructor(s,t){super(s,t);this.type=s,this.event=t,this.skipOnKeyboardObservable=!1}}
+export{D,$v,Id,zs,Ir,iu,ph};
+
+//# debugId=AAF082A5DB30C08D64756E2164756E21
+//# sourceMappingURL=site-69hazd3x.js.map

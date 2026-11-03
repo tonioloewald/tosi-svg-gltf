@@ -1,0 +1,21 @@
+# Generated output.
+docs/
+demo/docs.json
+node_modules/
+dist/
+llms.txt
+
+# Pre-release review reports are filed verbatim.
+reviews/
+
+# Blender side: Python and the vendored wheels are not prettier's business.
+blender/
+static/downloads/
+
+# Copied UNCHANGED from tosijs-coding-practices/templates: the rollout's
+# adoption check is byte-identity with the template.
+.github/workflows/publish.yml
+
+.claude/
+.mcp.json
+.practices/

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script>
+    document.documentElement.classList.add('tosi-js')
+    document.addEventListener('click', function (e) {
+      if (customElements.get('tosi-doc-system')) return
+      var b = e.target.closest && e.target.closest('.doc-nav .nav-toggle')
+      if (!b) return
+      var open = b.closest('.nav-branch').classList.toggle('-open')
+      b.setAttribute('aria-expanded', String(open))
+    })
+    try {
+      var p = JSON.parse(localStorage.getItem('tosi-doc-system-prefs') || '{}')
+      var t = p.theme || 'system'
+      if (t === 'dark' || (t === 'system' && matchMedia('(prefers-color-scheme: dark)').matches))
+        document.documentElement.classList.add('darkmode')
+      if (p.highContrast) document.documentElement.classList.add('high-contrast')
+    } catch (e) {}
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="../doc-system.css?v=9e86a918ede0" data-tosi-doc-system />
+  <title>hydrate — tosi-svg-gltf</title>
+  <meta name="description" content="SvgToCanvas(svg, width, height) rasterizes SVG text onto a new canvas of exactly that size. It is the engine-agnostic half of the library: anything that can…" />
+  <link rel="alternate" type="text/markdown" href="index.md" title="hydrate — tosi-svg-gltf (markdown)" />
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="tosi-svg-gltf" />
+  <meta property="og:title" content="hydrate — tosi-svg-gltf" />
+  <meta property="og:description" content="SvgToCanvas(svg, width, height) rasterizes SVG text onto a new canvas of exactly that size. It is the engine-agnostic half of the library: anything that can…" />
+  <meta name="twitter:card" content="summary" />
+  <link rel="icon" href="../favicon.svg" />
+</head>
+<body>
+  <tosi-doc-system docs="../docs.json?v=fef577d4399c" config="{&quot;projectName&quot;:&quot;tosi-svg-gltf&quot;,&quot;projectLinks&quot;:{&quot;tosijs&quot;:&quot;https://tosijs.net&quot;,&quot;github&quot;:&quot;https://github.com/tonioloewald/tosi-svg-gltf&quot;},&quot;ebooks&quot;:[]}">
+  <article class="doc-content" data-doc="hydrate.ts">
+<h1 id="hydrate">hydrate</h1>
+<p><code>svgToCanvas(svg, width, height)</code> rasterizes SVG text onto a new canvas of
+exactly that size. It is the engine-agnostic half of the library: anything
+that can make a texture from a canvas (three.js <code>CanvasTexture</code>, a raw WebGL
+<code>texImage2D</code>, a 2D game) can use it. The <a href="/babylon/">Babylon adapter</a> does
+<strong>not</strong> go through it: it hands the sized SVG to Babylon&#39;s own image loader,
+which keeps the glTF sampler, mipmaps and orientation exactly as for a PNG.</p>
+<pre><code class="language-js">import { svgToCanvas } from &#39;tosi-svg-gltf&#39;
+
+const svg = `&lt;svg xmlns=&quot;http://www.w3.org/2000/svg&quot; viewBox=&quot;0 0 10 10&quot;&gt;
+  &lt;circle cx=&quot;5&quot; cy=&quot;5&quot; r=&quot;4&quot; fill=&quot;#2f9e8f&quot;/&gt;
+  &lt;path d=&quot;M3 5h4M5 3v4&quot; stroke=&quot;white&quot; stroke-width=&quot;0.6&quot;/&gt;
+&lt;/svg&gt;`
+
+const small = await svgToCanvas(svg, 16, 16)
+const large = await svgToCanvas(svg, 256, 256)
+small.style.width = large.style.width = &#39;128px&#39;
+small.style.imageRendering = &#39;pixelated&#39;
+preview.append(small, large)
+</code></pre>
+<p>The left canvas is the same SVG drawn at 16 px, the right at 256 px. A
+texture made from an SVG is only as sharp as the size you rasterize it at.
+That size is what the <a href="/babylon/">Babylon adapter</a> chooses per device.</p>
+<h2 id="how-it-decodes">How it decodes</h2>
+<p>The SVG goes into a <code>Blob</code>, then an <code>&lt;img&gt;</code>, and <code>img.decode()</code> resolves
+once the browser has it ready to draw. <code>createImageBitmap(blob)</code> would be
+the obvious off-thread route, but browsers refuse SVG blobs there (they
+reject with &quot;the source image could not be decoded&quot;), so this library does
+not try it.</p>
+<p>An SVG drawn as an image <strong>cannot run script or fetch anything</strong>: browsers
+treat it as an isolated, static document. That is the security model for
+loading an SVG from a model file you did not author, and it is also why a
+web font the page has loaded does not reach the texture. Use system fonts,
+or convert text to paths before export.</p>
+
+  </article>
+  <nav class="doc-nav" aria-label="Documentation">
+  <ul>
+    <li><a class="doc-link" href="../">tosi-svg-gltf</a></li>
+    <li><a class="doc-link" href="../blender/">Blender add-on</a></li>
+    <li><a class="doc-link" href="../payload/">payload</a></li>
+    <li><a class="doc-link" href="../size-svg/">size-svg</a></li>
+    <li><a class="doc-link current" href="../hydrate/" aria-current="page">hydrate</a></li>
+    <li><a class="doc-link" href="../babylon/">babylon</a></li>
+    <li><a class="doc-link" href="../format/">The format</a></li>
+    <li><a class="doc-link" href="../CHANGELOG/">Changelog</a></li>
+  </ul>
+  </nav>
+  <ul class="doc-navbar">
+    <li><a href="/blender/" data-icon="download">Blender add-on</a></li>
+    <li><a href="https://3d.tosijs.net" data-icon="tosiXr">tosijs-3d</a></li>
+    <li><a href="https://github.com/tonioloewald/tosi-svg-gltf" data-icon="github">github</a></li>
+  </ul>
+  </tosi-doc-system>
+  <script type="module" src="../hydrate-9g3hpszc.js"></script>
+</body>
+</html>

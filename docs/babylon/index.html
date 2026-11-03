@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script>
+    document.documentElement.classList.add('tosi-js')
+    document.addEventListener('click', function (e) {
+      if (customElements.get('tosi-doc-system')) return
+      var b = e.target.closest && e.target.closest('.doc-nav .nav-toggle')
+      if (!b) return
+      var open = b.closest('.nav-branch').classList.toggle('-open')
+      b.setAttribute('aria-expanded', String(open))
+    })
+    try {
+      var p = JSON.parse(localStorage.getItem('tosi-doc-system-prefs') || '{}')
+      var t = p.theme || 'system'
+      if (t === 'dark' || (t === 'system' && matchMedia('(prefers-color-scheme: dark)').matches))
+        document.documentElement.classList.add('darkmode')
+      if (p.highContrast) document.documentElement.classList.add('high-contrast')
+    } catch (e) {}
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="../doc-system.css?v=9e86a918ede0" data-tosi-doc-system />
+  <title>babylon — tosi-svg-gltf</title>
+  <meta name="description" content="RegisterSvgExtension(options?) teaches Babylon&#39;s glTF loader to read SVG textures. Call it once, before loading: every glTF/GLB loaded afterwards, by any API…" />
+  <link rel="alternate" type="text/markdown" href="index.md" title="babylon — tosi-svg-gltf (markdown)" />
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="tosi-svg-gltf" />
+  <meta property="og:title" content="babylon — tosi-svg-gltf" />
+  <meta property="og:description" content="RegisterSvgExtension(options?) teaches Babylon&#39;s glTF loader to read SVG textures. Call it once, before loading: every glTF/GLB loaded afterwards, by any API…" />
+  <meta name="twitter:card" content="summary" />
+  <link rel="icon" href="../favicon.svg" />
+</head>
+<body>
+  <tosi-doc-system docs="../docs.json?v=fef577d4399c" config="{&quot;projectName&quot;:&quot;tosi-svg-gltf&quot;,&quot;projectLinks&quot;:{&quot;tosijs&quot;:&quot;https://tosijs.net&quot;,&quot;github&quot;:&quot;https://github.com/tonioloewald/tosi-svg-gltf&quot;},&quot;ebooks&quot;:[]}">
+  <article class="doc-content" data-doc="babylon.ts">
+<h1 id="babylon">babylon</h1>
+<p><code>registerSvgExtension(options?)</code> teaches Babylon&#39;s glTF loader to read SVG
+textures. Call it once, before loading: every glTF/GLB loaded afterwards,
+by any API (<code>LoadAssetContainerAsync</code>, <code>ImportMeshAsync</code>, tosijs-3d&#39;s
+<code>b3dLoader</code>, …), gets its SVG images rasterized at the size you choose.</p>
+<pre><code class="language-js">import { b3d, b3dLight, b3dLoader } from &#39;tosijs-3d&#39;
+import { orbitCam } from &#39;tosijs-3d/demo-utils&#39;
+import { registerSvgExtension } from &#39;tosi-svg-gltf/babylon&#39;
+
+registerSvgExtension({ scale: 2 })
+
+preview.append(
+  b3d(
+    {
+      sceneCreated(el) {
+        orbitCam(el, { alpha: Math.PI / 2, beta: Math.PI / 2.4, radius: 3.2, target: [0, 0, 0] })
+      },
+    },
+    b3dLight({ intensity: 1.2 }),
+    b3dLoader({ url: &#39;/samples/svg-plane.glb&#39; }),
+  )
+)
+</code></pre>
+<pre><code class="language-css">tosi-b3d { width: 100%; height: 100%; }
+</code></pre>
+<pre><code class="language-test">// LINE COMMENTS ONLY in a fence: a block comment would end the doc comment.
+// This fence must stay ADJACENT to the example above: waitFor searches that
+// example&#39;s preview, and prose between the fences makes them two examples.
+const el = await waitFor(&#39;tosi-b3d&#39;, 30000)
+for (let i = 0; i &lt; 600 &amp;&amp; !el.scene; i++) await waitMs(50)
+let texture = null
+for (let i = 0; i &lt; 600 &amp;&amp; !texture; i++) {
+  texture = el.scene.textures.find((t) =&gt; t.name.startsWith(&#39;tosi-svg-sample&#39;) &amp;&amp; t.isReady())
+  if (!texture) await waitMs(50)
+}
+
+test(&#39;the SVG texture loaded at the requested size, not the placeholder&#39;, () =&gt; {
+  expect(Boolean(texture)).toBe(true)
+  // authored at 1024 × 1024, registered with scale: 2
+  expect(texture.getSize()).toEqual({ width: 2048, height: 2048 })
+})
+</code></pre>
+<p>That model was exported from Blender by this repo&#39;s own test (see
+<a href="/blender/">Blender</a>). Its image holds about 1.4 KB of SVG and a 64 px
+placeholder PNG. Zoom in: the edges stay sharp at the 2048 px it was
+rasterized at, which is twice what the author set.</p>
+<h2 id="options">Options</h2>
+<table>
+<thead>
+<tr>
+<th>option</th>
+<th>default</th>
+<th>what it does</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>scale</code></td>
+<td><code>1</code></td>
+<td>Multiplies each image&#39;s authored size. <code>0.5</code> on a phone, <code>2</code> for a close-up.</td>
+</tr>
+<tr>
+<td><code>maxResolution</code></td>
+<td><code>4096</code></td>
+<td>No side exceeds this, or the GPU&#39;s own limit if lower.</td>
+</tr>
+<tr>
+<td><code>resolve</code></td>
+<td>—</td>
+<td><code>(payload, image) =&gt; ({ width, height })</code> to choose per image; overrides both.</td>
+</tr>
+</tbody></table>
+<p><code>scale</code> and <code>maxResolution</code> can also be functions of nothing, read at each
+load, so one registration can follow a quality setting.</p>
+<h2 id="how-it-works">How it works</h2>
+<p>The extension&#39;s <code>onLoading</code> hook runs before any material loads. For each
+image carrying a <a href="/payload/">payload</a>, it:</p>
+<ol>
+<li>computes the target size,</li>
+<li>sets the SVG root&#39;s <code>width</code>/<code>height</code> to it (<a href="/size-svg/">sizeSvg</a>),</li>
+<li>sets the image&#39;s <code>mimeType</code> to <code>image/svg+xml</code> and pre-seeds its data
+with the SVG bytes, so the placeholder PNG is never read.</li>
+</ol>
+<p>Babylon then loads the texture exactly as it would a PNG. The sampler (wrap,
+filtering, mipmaps), <code>texCoord</code>, <code>KHR_texture_transform</code>, sRGB handling,
+naming and asset-container ownership are all Babylon&#39;s own code path. There
+is no <code>DynamicTexture</code> and no second copy of the loader&#39;s logic.</p>
+<p>Images without a payload are untouched. An SVG the browser cannot decode
+fails the load, exactly as a corrupt PNG would.</p>
+<p><code>unregisterSvgExtension()</code> removes it.</p>
+
+  </article>
+  <nav class="doc-nav" aria-label="Documentation">
+  <ul>
+    <li><a class="doc-link" href="../">tosi-svg-gltf</a></li>
+    <li><a class="doc-link" href="../blender/">Blender add-on</a></li>
+    <li><a class="doc-link" href="../payload/">payload</a></li>
+    <li><a class="doc-link" href="../size-svg/">size-svg</a></li>
+    <li><a class="doc-link" href="../hydrate/">hydrate</a></li>
+    <li><a class="doc-link current" href="../babylon/" aria-current="page">babylon</a></li>
+    <li><a class="doc-link" href="../format/">The format</a></li>
+    <li><a class="doc-link" href="../CHANGELOG/">Changelog</a></li>
+  </ul>
+  </nav>
+  <ul class="doc-navbar">
+    <li><a href="/blender/" data-icon="download">Blender add-on</a></li>
+    <li><a href="https://3d.tosijs.net" data-icon="tosiXr">tosijs-3d</a></li>
+    <li><a href="https://github.com/tonioloewald/tosi-svg-gltf" data-icon="github">github</a></li>
+  </ul>
+  </tosi-doc-system>
+  <script type="module" src="../hydrate-9g3hpszc.js"></script>
+</body>
+</html>

@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script>
+    document.documentElement.classList.add('tosi-js')
+    document.addEventListener('click', function (e) {
+      if (customElements.get('tosi-doc-system')) return
+      var b = e.target.closest && e.target.closest('.doc-nav .nav-toggle')
+      if (!b) return
+      var open = b.closest('.nav-branch').classList.toggle('-open')
+      b.setAttribute('aria-expanded', String(open))
+    })
+    try {
+      var p = JSON.parse(localStorage.getItem('tosi-doc-system-prefs') || '{}')
+      var t = p.theme || 'system'
+      if (t === 'dark' || (t === 'system' && matchMedia('(prefers-color-scheme: dark)').matches))
+        document.documentElement.classList.add('darkmode')
+      if (p.highContrast) document.documentElement.classList.add('high-contrast')
+    } catch (e) {}
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="../doc-system.css?v=9e86a918ede0" data-tosi-doc-system />
+  <title>Blender add-on — tosi-svg-gltf</title>
+  <meta name="description" content="SVG Textures for glTF lets you use an SVG file as a texture in Blender and export it to glTF/GLB as the SVG itself." />
+  <link rel="alternate" type="text/markdown" href="index.md" title="Blender add-on — tosi-svg-gltf (markdown)" />
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="tosi-svg-gltf" />
+  <meta property="og:title" content="Blender add-on — tosi-svg-gltf" />
+  <meta property="og:description" content="SVG Textures for glTF lets you use an SVG file as a texture in Blender and export it to glTF/GLB as the SVG itself." />
+  <meta name="twitter:card" content="summary" />
+  <link rel="icon" href="../favicon.svg" />
+</head>
+<body>
+  <tosi-doc-system docs="../docs.json?v=fef577d4399c" config="{&quot;projectName&quot;:&quot;tosi-svg-gltf&quot;,&quot;projectLinks&quot;:{&quot;tosijs&quot;:&quot;https://tosijs.net&quot;,&quot;github&quot;:&quot;https://github.com/tonioloewald/tosi-svg-gltf&quot;},&quot;ebooks&quot;:[]}">
+  <article class="doc-content" data-doc="blender.md">
+<h1 id="blender-add-on">Blender add-on</h1>
+<!--{"pin":"top","order":2}--><p><strong>SVG Textures for glTF</strong> lets you use an SVG file as a texture in Blender
+and export it to glTF/GLB <strong>as the SVG itself</strong>. A viewer that supports it
+draws the texture sharp at whatever size it needs. Everything else still
+sees an ordinary (small) image.</p>
+<h2 id="download">Download</h2>
+<p>
+  <a class="download" href="/downloads/tosi_svg-0.1.0.zip" download>
+    ⬇ Download tosi_svg-0.1.0.zip
+  </a>
+</p><p>Version 0.1.0 · 7.7 MB · Blender 4.2 or later · Windows, macOS and Linux in
+one file.</p>
+<p>The download is large because it carries the SVG renderer
+(<a href="https://github.com/linebender/resvg">resvg</a>) for every platform. Blender
+installs only the one for your computer.</p>
+<h2 id="install">Install</h2>
+<ol>
+<li>Download the <code>.zip</code> above. <strong>Don&#39;t unzip it.</strong></li>
+<li>In Blender, open <strong>Edit → Preferences → Get Extensions</strong>.</li>
+<li>Click the <strong>⌄</strong> menu at the top right and choose <strong>Install from Disk…</strong></li>
+<li>Pick the <code>.zip</code>. &quot;SVG Textures for glTF&quot; appears under <strong>Add-ons</strong>, enabled.</li>
+</ol>
+<p>You can also drag the <code>.zip</code> onto Blender&#39;s window.</p>
+<h2 id="use-it">Use it</h2>
+<h3 id="import-an-svg">Import an SVG</h3>
+<p><strong>File → Import → SVG as Texture (.svg)</strong>, or in the Image Editor,
+<strong>Image → Open SVG as Texture…</strong></p>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Resolution</strong></td>
+<td>The longest side, in pixels. This is the size Blender previews it at, and the size a viewer draws by default.</td>
+</tr>
+<tr>
+<td><strong>Add to Active Material</strong></td>
+<td>Adds an Image Texture node to the selected object&#39;s material (making one if needed), connected to Base Color.</td>
+</tr>
+<tr>
+<td><strong>Connect Alpha</strong></td>
+<td>Also connects the texture&#39;s transparency to the material&#39;s Alpha.</td>
+</tr>
+</tbody></table>
+<p>The result is a normal image texture. Paint with it, bake with it, render it
+in Eevee or Cycles. The only difference is that it remembers the SVG it came
+from.</p>
+<blockquote>
+<p>Blender&#39;s built-in <strong>File → Import → Scalable Vector Graphics</strong> is a
+different thing: it turns an SVG into curves (3D geometry). Use this add-on
+when you want the SVG as a <em>texture</em>.</p>
+</blockquote>
+<h3 id="change-it">Change it</h3>
+<p>With the image showing in the <strong>Image Editor</strong>, or its Image Texture node
+selected in the <strong>Shader Editor</strong>, press <strong>N</strong> for the sidebar. The <strong>SVG
+Texture</strong> panel is under the <strong>Image</strong> tab (Image Editor) or the <strong>Node</strong> tab
+(Shader Editor):</p>
+<ul>
+<li><strong>Resolution:</strong> redraws the preview at a new size. This also sets the
+default size viewers draw it at.</li>
+<li><strong>Fallback Size:</strong> the thumbnail stored for viewers that don&#39;t read SVG
+(default 64 px). Set to 0 to store a single transparent pixel instead.</li>
+<li><strong>Reload SVG:</strong> re-reads the file after you&#39;ve edited it in Illustrator,
+Inkscape, Figma…</li>
+<li><strong>Convert to Bitmap:</strong> forgets the SVG. The image then exports as a normal
+PNG.</li>
+</ul>
+<h3 id="export">Export</h3>
+<p><strong>File → Export → glTF 2.0</strong> as usual, as <code>.glb</code> or <code>.gltf</code>. No options to
+set. Each SVG image is written as:</p>
+<ul>
+<li>the SVG text, in the image&#39;s <code>extras</code>;</li>
+<li>a placeholder PNG where the pixels would have gone.</li>
+</ul>
+<p>Check the console after exporting: any image the add-on could not convert is
+named there, and it exports as an ordinary bitmap instead.</p>
+<h2 id="what-works-what-doesnt">What works, what doesn&#39;t</h2>
+<p><strong>Works:</strong> shapes, paths, strokes, gradients, patterns, clipping, masks,
+opacity, transforms, embedded (<code>data:</code>) images, and text in fonts installed on
+the viewer&#39;s device.</p>
+<p><strong>Watch out for:</strong></p>
+<ul>
+<li><strong>Text.</strong> A viewer draws text with <em>its</em> fonts. If the font isn&#39;t
+installed there, it falls back to another and the layout shifts. For
+anything that must look exact (logos, labels), <strong>convert text to outlines /
+paths</strong> in your vector app before saving the SVG.</li>
+<li><strong>Linked files.</strong> An <code>&lt;image href=&quot;photo.jpg&quot;&gt;</code> that points at another file
+will not be found by the viewer. Embed it, or don&#39;t use it.</li>
+<li><strong>Filters and blend modes</strong> can differ slightly between Blender&#39;s preview
+(resvg) and a web browser.</li>
+<li><strong>Scripts, animation and interactivity</strong> are ignored. A texture is a still
+image.</li>
+<li><strong>One image per texture.</strong> If Blender&#39;s exporter has to <em>combine</em> images
+into one (e.g. a color from one image and alpha from another), that
+texture exports as a bitmap.</li>
+<li><strong>UDIM tiles</strong> are not supported.</li>
+</ul>
+<h2 id="viewing-the-result">Viewing the result</h2>
+<p>Any glTF viewer opens the file and shows the placeholder. To see the SVG at
+full sharpness the viewer needs SVG support: <a href="https://3d.tosijs.net">tosijs-3d</a>
+and any Babylon.js app using <a href="/babylon/">this package</a> have it.</p>
+<h2 id="troubleshooting">Troubleshooting</h2>
+<p><strong>&quot;The SVG renderer (resvg) is not available.&quot;</strong> The add-on was installed
+without its renderer. Install it from the <code>.zip</code> above, not from a folder
+or a single <code>.py</code> file.</p>
+<p><strong>The import menu item is missing.</strong> Check <strong>Edit → Preferences → Add-ons</strong>:
+&quot;SVG Textures for glTF&quot; must be enabled.</p>
+<p><strong>My exported file is still big.</strong> Something else in the scene is large.
+Check the console for the add-on&#39;s messages, and make sure the texture was
+imported with this add-on: its sidebar panel shows the SVG&#39;s size in bytes.</p>
+
+  </article>
+  <nav class="doc-nav" aria-label="Documentation">
+  <ul>
+    <li><a class="doc-link" href="../">tosi-svg-gltf</a></li>
+    <li><a class="doc-link current" href="../blender/" aria-current="page">Blender add-on</a></li>
+    <li><a class="doc-link" href="../payload/">payload</a></li>
+    <li><a class="doc-link" href="../size-svg/">size-svg</a></li>
+    <li><a class="doc-link" href="../hydrate/">hydrate</a></li>
+    <li><a class="doc-link" href="../babylon/">babylon</a></li>
+    <li><a class="doc-link" href="../format/">The format</a></li>
+    <li><a class="doc-link" href="../CHANGELOG/">Changelog</a></li>
+  </ul>
+  </nav>
+  <ul class="doc-navbar">
+    <li><a href="/blender/" data-icon="download">Blender add-on</a></li>
+    <li><a href="https://3d.tosijs.net" data-icon="tosiXr">tosijs-3d</a></li>
+    <li><a href="https://github.com/tonioloewald/tosi-svg-gltf" data-icon="github">github</a></li>
+  </ul>
+  </tosi-doc-system>
+  <script type="module" src="../hydrate-9g3hpszc.js"></script>
+</body>
+</html>

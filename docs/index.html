@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script>
+    document.documentElement.classList.add('tosi-js')
+    document.addEventListener('click', function (e) {
+      if (customElements.get('tosi-doc-system')) return
+      var b = e.target.closest && e.target.closest('.doc-nav .nav-toggle')
+      if (!b) return
+      var open = b.closest('.nav-branch').classList.toggle('-open')
+      b.setAttribute('aria-expanded', String(open))
+    })
+    try {
+      var p = JSON.parse(localStorage.getItem('tosi-doc-system-prefs') || '{}')
+      var t = p.theme || 'system'
+      if (t === 'dark' || (t === 'system' && matchMedia('(prefers-color-scheme: dark)').matches))
+        document.documentElement.classList.add('darkmode')
+      if (p.highContrast) document.documentElement.classList.add('high-contrast')
+    } catch (e) {}
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="doc-system.css?v=9e86a918ede0" data-tosi-doc-system />
+  <title>tosi-svg-gltf</title>
+  <meta name="description" content="SVG textures inside glTF/GLB, rasterized by the viewer at the resolution it needs." />
+  <link rel="alternate" type="text/markdown" href="index.md" title="tosi-svg-gltf (markdown)" />
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="tosi-svg-gltf" />
+  <meta property="og:title" content="tosi-svg-gltf" />
+  <meta property="og:description" content="SVG textures inside glTF/GLB, rasterized by the viewer at the resolution it needs." />
+  <meta name="twitter:card" content="summary" />
+  <link rel="icon" href="favicon.svg" />
+</head>
+<body>
+  <tosi-doc-system docs="docs.json?v=fef577d4399c" config="{&quot;projectName&quot;:&quot;tosi-svg-gltf&quot;,&quot;projectLinks&quot;:{&quot;tosijs&quot;:&quot;https://tosijs.net&quot;,&quot;github&quot;:&quot;https://github.com/tonioloewald/tosi-svg-gltf&quot;},&quot;ebooks&quot;:[]}">
+  <article class="doc-content" data-doc="README.md">
+<h1 id="tosi-svg-gltf">tosi-svg-gltf</h1>
+<!--{"pin":"top","order":1}--><p><strong>SVG textures inside glTF/GLB, rasterized by the viewer at the resolution it needs.</strong></p>
+<p>A 2048 × 2048 texture is 16 MB of GPU memory and, as a PNG, often a megabyte
+or more of download. The SVG it was drawn from is usually a few kilobytes.
+This project ships the SVG in the model and draws it on the device: as sharp
+as that device can show it, no larger than it can afford.</p>
+<p>It has two halves that share one small <a href="/format/">format</a>:</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong><a href="/blender/">Blender add-on</a></strong></td>
+<td>Import an SVG as an image texture. Blender shows a rasterized preview, and glTF export writes the SVG itself plus a tiny placeholder PNG. <a href="/blender/"><strong>Download</strong></a></td>
+</tr>
+<tr>
+<td><strong>This package</strong> (<code>tosi-svg-gltf</code>)</td>
+<td>A Babylon.js glTF loader extension that finds those SVGs and rasterizes them at the size you choose, plus an engine-agnostic core for anything else.</td>
+</tr>
+</tbody></table>
+<p>A file written this way is still <strong>valid glTF 2.0</strong>. A viewer that has never
+heard of it shows the placeholder, a 64 px thumbnail by default.</p>
+<h2 id="use-it-with-tosijs-3d-or-babylonjs">Use it with tosijs-3d or Babylon.js</h2>
+<pre><code class="language-sh" data-highlighted>bun <span class="token function">add</span> tosi-svg-gltf
+</code></pre>
+<pre data-example-mode="static"><code class="language-ts" data-highlighted><span class="token keyword">import</span> <span class="token punctuation">{</span> registerSvgExtension <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">'tosi-svg-gltf/babylon'</span>
+
+<span class="token comment">// Once, before loading models. Every glTF loader path picks it up,</span>
+<span class="token comment">// including tosijs-3d's b3dLoader and LoadAssetContainerAsync.</span>
+<span class="token function">registerSvgExtension</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
+  scale<span class="token operator">:</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token comment">// × the size the author chose in Blender</span>
+  maxResolution<span class="token operator">:</span> <span class="token number">2048</span><span class="token punctuation">,</span> <span class="token comment">// and never more than this per side</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span>
+</code></pre>
+<p>That&#39;s all. A live example is on the <a href="/babylon/">babylon</a> page.</p>
+<p><code>@babylonjs/core</code> and <code>@babylonjs/loaders</code> 9.x are peer dependencies of the
+<code>/babylon</code> entry only. The package root (<code>tosi-svg-gltf</code>) has no dependencies
+and does not import Babylon.</p>
+<h2 id="anything-else">Anything else</h2>
+<p>The root export is the engine-agnostic part:</p>
+<ul>
+<li><a href="/payload/"><code>readSvgPayload(image)</code></a>: the SVG payload on a glTF image, or <code>null</code>;</li>
+<li><a href="/payload/"><code>textureSize(payload, { scale, maxResolution })</code></a>: the size to draw it at;</li>
+<li><a href="/size-svg/"><code>sizeSvg(svg, width, height)</code></a>: set an SVG&#39;s pixel size, scaling its content;</li>
+<li><a href="/hydrate/"><code>svgToCanvas(svg, width, height)</code></a>: rasterize onto a canvas, e.g. for a three.js <code>CanvasTexture</code>.</li>
+</ul>
+<h2 id="why-not-just-export-a-big-png">Why not just export a big PNG?</h2>
+<ul>
+<li><strong>Size on the wire.</strong> Line art, UI panels, labels, diagrams and decals are
+tiny as SVG and large as bitmaps.</li>
+<li><strong>Memory on the device.</strong> The viewer chooses: 512 px on a phone, 4096 on
+a desktop, the same file for both.</li>
+<li><strong>Sharpness.</strong> Text and hairlines stay crisp at whatever size you draw them.</li>
+</ul>
+<p>It is the wrong tool for photographs, painted textures and noise: anything
+that isn&#39;t already vector art.</p>
+<h2 id="develop">Develop</h2>
+<pre><code class="language-sh" data-highlighted>bun <span class="token function">install</span>
+bun start            <span class="token comment"># doc site + dev server on https://localhost:8034</span>
+bun <span class="token builtin class-name">test</span>             <span class="token comment"># unit tests</span>
+bun blender          <span class="token comment"># Blender extension: fetch wheels, build the zip, test in Blender</span>
+</code></pre>
+<p>See <a href="https://github.com/tonioloewald/tosi-svg-gltf/blob/main/CLAUDE.md">CLAUDE.md</a>
+for how the pieces fit together.</p>
+
+  </article>
+  <nav class="doc-nav" aria-label="Documentation">
+  <ul>
+    <li><a class="doc-link current" href="./" aria-current="page">tosi-svg-gltf</a></li>
+    <li><a class="doc-link" href="blender/">Blender add-on</a></li>
+    <li><a class="doc-link" href="payload/">payload</a></li>
+    <li><a class="doc-link" href="size-svg/">size-svg</a></li>
+    <li><a class="doc-link" href="hydrate/">hydrate</a></li>
+    <li><a class="doc-link" href="babylon/">babylon</a></li>
+    <li><a class="doc-link" href="format/">The format</a></li>
+    <li><a class="doc-link" href="CHANGELOG/">Changelog</a></li>
+  </ul>
+  </nav>
+  <ul class="doc-navbar">
+    <li><a href="/blender/" data-icon="download">Blender add-on</a></li>
+    <li><a href="https://3d.tosijs.net" data-icon="tosiXr">tosijs-3d</a></li>
+    <li><a href="https://github.com/tonioloewald/tosi-svg-gltf" data-icon="github">github</a></li>
+  </ul>
+  </tosi-doc-system>
+  <script type="module" src="hydrate-9g3hpszc.js"></script>
+</body>
+</html>

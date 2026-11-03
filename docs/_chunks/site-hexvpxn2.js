@@ -1,0 +1,5 @@
+import{z}from"./site-egfyy78s.js";import{Y,W}from"./site-weckhv4a.js";var i="KHR_materials_diffuse_roughness";class AE{constructor(e){this.name=i,this.order=190,this._loader=e,this.enabled=this._loader.isExtensionUsed(i)}dispose(){this._loader=null}loadMaterialPropertiesAsync(e,s,t){return z.LoadExtensionAsync(e,s,this.name,async(o,n)=>{let r=[];return r.push(this._loader.loadMaterialPropertiesAsync(e,s,t)),r.push(this._loadDiffuseRoughnessPropertiesAsync(o,n,t)),await Promise.all(r).then(()=>{})})}_loadDiffuseRoughnessPropertiesAsync(e,s,t){let o=this._loader._getOrCreateMaterialAdapter(t),n=[];if(o.baseDiffuseRoughness=s.diffuseRoughnessFactor??0,s.diffuseRoughnessTexture)n.push(this._loader.loadTextureInfoAsync(`${e}/diffuseRoughnessTexture`,s.diffuseRoughnessTexture,(r)=>{r.name=`${t.name} (Diffuse Roughness)`,o.baseDiffuseRoughnessTexture=r}));return Promise.all(n).then(()=>{})}}var u=!1;function Yb(){if(u)return;u=!0,W(i),Y(i,!0,(e)=>new AE(e))}
+export{AE,Yb};
+
+//# debugId=3D11239AB34C468D64756E2164756E21
+//# sourceMappingURL=site-hexvpxn2.js.map

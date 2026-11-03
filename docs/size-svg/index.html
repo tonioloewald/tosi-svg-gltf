@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script>
+    document.documentElement.classList.add('tosi-js')
+    document.addEventListener('click', function (e) {
+      if (customElements.get('tosi-doc-system')) return
+      var b = e.target.closest && e.target.closest('.doc-nav .nav-toggle')
+      if (!b) return
+      var open = b.closest('.nav-branch').classList.toggle('-open')
+      b.setAttribute('aria-expanded', String(open))
+    })
+    try {
+      var p = JSON.parse(localStorage.getItem('tosi-doc-system-prefs') || '{}')
+      var t = p.theme || 'system'
+      if (t === 'dark' || (t === 'system' && matchMedia('(prefers-color-scheme: dark)').matches))
+        document.documentElement.classList.add('darkmode')
+      if (p.highContrast) document.documentElement.classList.add('high-contrast')
+    } catch (e) {}
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="../doc-system.css?v=9e86a918ede0" data-tosi-doc-system />
+  <title>size-svg — tosi-svg-gltf</title>
+  <meta name="description" content="SizeSvg(svg, width, height) returns the SVG with its root element&#39;s width and height set to that many pixels, so a browser decodes it at the size you are about…" />
+  <link rel="alternate" type="text/markdown" href="index.md" title="size-svg — tosi-svg-gltf (markdown)" />
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="tosi-svg-gltf" />
+  <meta property="og:title" content="size-svg — tosi-svg-gltf" />
+  <meta property="og:description" content="SizeSvg(svg, width, height) returns the SVG with its root element&#39;s width and height set to that many pixels, so a browser decodes it at the size you are about…" />
+  <meta name="twitter:card" content="summary" />
+  <link rel="icon" href="../favicon.svg" />
+</head>
+<body>
+  <tosi-doc-system docs="../docs.json?v=fef577d4399c" config="{&quot;projectName&quot;:&quot;tosi-svg-gltf&quot;,&quot;projectLinks&quot;:{&quot;tosijs&quot;:&quot;https://tosijs.net&quot;,&quot;github&quot;:&quot;https://github.com/tonioloewald/tosi-svg-gltf&quot;},&quot;ebooks&quot;:[]}">
+  <article class="doc-content" data-doc="size-svg.ts">
+<h1 id="size-svg">size-svg</h1>
+<p><code>sizeSvg(svg, width, height)</code> returns the SVG with its root element&#39;s
+<code>width</code> and <code>height</code> set to that many pixels, so a browser decodes it at the
+size you are about to draw it. That matters because a browser hands an SVG
+<code>&lt;img&gt;</code> to WebGL at its <strong>intrinsic</strong> size: an icon authored as
+<code>width=&quot;24&quot; height=&quot;24&quot;</code> becomes a 24 px texture however large it is drawn.</p>
+<p>The edit is textual and works without a DOM, in a worker too:</p>
+<ul>
+<li>if the root has no <code>viewBox</code>, one is added from its original <code>width</code> and
+<code>height</code> (px, pt, pc, mm, cm, in or unitless), so the drawing <strong>scales</strong>
+to the new size instead of being cropped to it;</li>
+<li><code>width</code> and <code>height</code> are replaced, or added;</li>
+<li>nothing else in the document changes.</li>
+</ul>
+<pre><code class="language-test">import { sizeSvg } from &#39;tosi-svg-gltf&#39;
+
+test(&#39;an icon is scaled, not cropped&#39;, () =&gt; {
+  const out = sizeSvg(&#39;&lt;svg width=&quot;24&quot; height=&quot;24&quot;&gt;&lt;rect/&gt;&lt;/svg&gt;&#39;, 512, 512)
+  expect(out.includes(&#39;viewBox=&quot;0 0 24 24&quot;&#39;)).toBe(true)
+  expect(out.includes(&#39;width=&quot;512&quot;&#39;)).toBe(true)
+})
+</code></pre>
+
+  </article>
+  <nav class="doc-nav" aria-label="Documentation">
+  <ul>
+    <li><a class="doc-link" href="../">tosi-svg-gltf</a></li>
+    <li><a class="doc-link" href="../blender/">Blender add-on</a></li>
+    <li><a class="doc-link" href="../payload/">payload</a></li>
+    <li><a class="doc-link current" href="../size-svg/" aria-current="page">size-svg</a></li>
+    <li><a class="doc-link" href="../hydrate/">hydrate</a></li>
+    <li><a class="doc-link" href="../babylon/">babylon</a></li>
+    <li><a class="doc-link" href="../format/">The format</a></li>
+    <li><a class="doc-link" href="../CHANGELOG/">Changelog</a></li>
+  </ul>
+  </nav>
+  <ul class="doc-navbar">
+    <li><a href="/blender/" data-icon="download">Blender add-on</a></li>
+    <li><a href="https://3d.tosijs.net" data-icon="tosiXr">tosijs-3d</a></li>
+    <li><a href="https://github.com/tonioloewald/tosi-svg-gltf" data-icon="github">github</a></li>
+  </ul>
+  </tosi-doc-system>
+  <script type="module" src="../hydrate-9g3hpszc.js"></script>
+</body>
+</html>

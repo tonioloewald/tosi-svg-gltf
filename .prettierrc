@@ -1,0 +1,11 @@
+{
+  "semi": false,
+  "singleQuote": true,
+  "trailingComma": "es5",
+  "overrides": [
+    {
+      "files": ["*.md", "*.markdown", "*.mdx"],
+      "options": { "requirePragma": true }
+    }
+  ]
+}

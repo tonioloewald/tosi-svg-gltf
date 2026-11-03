@@ -1,0 +1,40 @@
+schema_version = "1.0.0"
+
+id = "tosi_svg"
+version = "0.1.0"
+name = "SVG Textures for glTF"
+tagline = "Use SVG files as textures and export them to glTF as vectors"
+maintainer = "Tonio Loewald"
+type = "add-on"
+
+website = "https://svg-gltf.tosijs.net/blender/"
+
+tags = ["Import-Export", "Material"]
+
+blender_version_min = "4.2.0"
+
+# Apache-2.0, like the JavaScript library in the same repository.
+license = ["SPDX:Apache-2.0"]
+
+# resvg-py is MIT; resvg itself is Apache-2.0 OR MIT. One abi3 wheel per
+# platform covers every Python from 3.10 (Blender 4.2 ships 3.11, 5.x 3.13).
+# bin/blender.ts downloads exactly these files and checks each against the
+# sha256 in blender/wheels.lock.json before building.
+wheels = [
+  "./wheels/resvg_py-0.5.0-cp310-abi3-macosx_11_0_arm64.whl",
+  "./wheels/resvg_py-0.5.0-cp310-abi3-macosx_10_12_x86_64.whl",
+  "./wheels/resvg_py-0.5.0-cp310-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl",
+  "./wheels/resvg_py-0.5.0-cp310-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl",
+  "./wheels/resvg_py-0.5.0-cp310-abi3-win_amd64.whl",
+  "./wheels/resvg_py-0.5.0-cp310-abi3-win_arm64.whl",
+]
+
+[permissions]
+files = "Read the SVG files you import"
+
+[build]
+paths_exclude_pattern = [
+  "__pycache__/",
+  "*.pyc",
+  ".*",
+]

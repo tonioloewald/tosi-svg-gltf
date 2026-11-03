@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script>
+    document.documentElement.classList.add('tosi-js')
+    document.addEventListener('click', function (e) {
+      if (customElements.get('tosi-doc-system')) return
+      var b = e.target.closest && e.target.closest('.doc-nav .nav-toggle')
+      if (!b) return
+      var open = b.closest('.nav-branch').classList.toggle('-open')
+      b.setAttribute('aria-expanded', String(open))
+    })
+    try {
+      var p = JSON.parse(localStorage.getItem('tosi-doc-system-prefs') || '{}')
+      var t = p.theme || 'system'
+      if (t === 'dark' || (t === 'system' && matchMedia('(prefers-color-scheme: dark)').matches))
+        document.documentElement.classList.add('darkmode')
+      if (p.highContrast) document.documentElement.classList.add('high-contrast')
+    } catch (e) {}
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="../doc-system.css?v=9e86a918ede0" data-tosi-doc-system />
+  <title>Changelog — tosi-svg-gltf</title>
+  <meta name="description" content="All notable changes to this project are documented here, in Keep a Changelog format. The npm package and the Blender extension share one version number." />
+  <link rel="alternate" type="text/markdown" href="index.md" title="Changelog — tosi-svg-gltf (markdown)" />
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="tosi-svg-gltf" />
+  <meta property="og:title" content="Changelog — tosi-svg-gltf" />
+  <meta property="og:description" content="All notable changes to this project are documented here, in Keep a Changelog format. The npm package and the Blender extension share one version number." />
+  <meta name="twitter:card" content="summary" />
+  <link rel="icon" href="../favicon.svg" />
+</head>
+<body>
+  <tosi-doc-system docs="../docs.json?v=fef577d4399c" config="{&quot;projectName&quot;:&quot;tosi-svg-gltf&quot;,&quot;projectLinks&quot;:{&quot;tosijs&quot;:&quot;https://tosijs.net&quot;,&quot;github&quot;:&quot;https://github.com/tonioloewald/tosi-svg-gltf&quot;},&quot;ebooks&quot;:[]}">
+  <article class="doc-content" data-doc="CHANGELOG.md">
+<h1 id="changelog">Changelog</h1>
+<!--{"pin":"bottom","order":2}--><p>All notable changes to this project are documented here, in
+<a href="https://keepachangelog.com/en/1.1.0/">Keep a Changelog</a> format. The npm
+package and the Blender extension share one version number.</p>
+<h2 id="unreleased">Unreleased</h2>
+<h2 id="010">0.1.0</h2>
+<p>First version.</p>
+<h3 id="added">Added</h3>
+<ul>
+<li><strong>Format v1:</strong> <code>images[i].extras.tosi_svg = { version, svg, width, height }</code>
+plus a placeholder PNG (<a href="/format/">the format</a>).</li>
+<li><strong><code>tosi-svg-gltf/babylon</code>:</strong> <code>registerSvgExtension({ scale, maxResolution, resolve })</code>,
+a Babylon.js 9 glTF loader extension that rasterizes SVG images at the
+chosen size through Babylon&#39;s own texture path.</li>
+<li><strong><code>tosi-svg-gltf</code>:</strong> the dependency-free core: <code>readSvgPayload</code>,
+<code>textureSize</code>, <code>sizeSvg</code>, <code>svgToCanvas</code>.</li>
+<li><strong>Blender extension <code>tosi_svg</code> (Blender 4.2+):</strong> import SVG as texture,
+resolution and fallback controls, reload, and glTF export of the SVG
+with a 64 px placeholder. Bundles resvg-py 0.5.0 wheels for Windows,
+macOS and Linux (x64 and arm64).</li>
+</ul>
+
+  </article>
+  <nav class="doc-nav" aria-label="Documentation">
+  <ul>
+    <li><a class="doc-link" href="../">tosi-svg-gltf</a></li>
+    <li><a class="doc-link" href="../blender/">Blender add-on</a></li>
+    <li><a class="doc-link" href="../payload/">payload</a></li>
+    <li><a class="doc-link" href="../size-svg/">size-svg</a></li>
+    <li><a class="doc-link" href="../hydrate/">hydrate</a></li>
+    <li><a class="doc-link" href="../babylon/">babylon</a></li>
+    <li><a class="doc-link" href="../format/">The format</a></li>
+    <li><a class="doc-link current" href="../CHANGELOG/" aria-current="page">Changelog</a></li>
+  </ul>
+  </nav>
+  <ul class="doc-navbar">
+    <li><a href="/blender/" data-icon="download">Blender add-on</a></li>
+    <li><a href="https://3d.tosijs.net" data-icon="tosiXr">tosijs-3d</a></li>
+    <li><a href="https://github.com/tonioloewald/tosi-svg-gltf" data-icon="github">github</a></li>
+  </ul>
+  </tosi-doc-system>
+  <script type="module" src="../hydrate-9g3hpszc.js"></script>
+</body>
+</html>

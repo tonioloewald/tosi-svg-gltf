@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script>
+    document.documentElement.classList.add('tosi-js')
+    document.addEventListener('click', function (e) {
+      if (customElements.get('tosi-doc-system')) return
+      var b = e.target.closest && e.target.closest('.doc-nav .nav-toggle')
+      if (!b) return
+      var open = b.closest('.nav-branch').classList.toggle('-open')
+      b.setAttribute('aria-expanded', String(open))
+    })
+    try {
+      var p = JSON.parse(localStorage.getItem('tosi-doc-system-prefs') || '{}')
+      var t = p.theme || 'system'
+      if (t === 'dark' || (t === 'system' && matchMedia('(prefers-color-scheme: dark)').matches))
+        document.documentElement.classList.add('darkmode')
+      if (p.highContrast) document.documentElement.classList.add('high-contrast')
+    } catch (e) {}
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="../doc-system.css?v=9e86a918ede0" data-tosi-doc-system />
+  <title>The format — tosi-svg-gltf</title>
+  <meta name="description" content="Version 1. This is the contract between an exporter (the Blender add-on) and a viewer (this package)." />
+  <link rel="alternate" type="text/markdown" href="index.md" title="The format — tosi-svg-gltf (markdown)" />
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="tosi-svg-gltf" />
+  <meta property="og:title" content="The format — tosi-svg-gltf" />
+  <meta property="og:description" content="Version 1. This is the contract between an exporter (the Blender add-on) and a viewer (this package)." />
+  <meta name="twitter:card" content="summary" />
+  <link rel="icon" href="../favicon.svg" />
+</head>
+<body>
+  <tosi-doc-system docs="../docs.json?v=fef577d4399c" config="{&quot;projectName&quot;:&quot;tosi-svg-gltf&quot;,&quot;projectLinks&quot;:{&quot;tosijs&quot;:&quot;https://tosijs.net&quot;,&quot;github&quot;:&quot;https://github.com/tonioloewald/tosi-svg-gltf&quot;},&quot;ebooks&quot;:[]}">
+  <article class="doc-content" data-doc="format.md">
+<h1 id="the-format">The format</h1>
+<!--{"pin":"bottom","order":1}--><p><strong>Version 1.</strong> This is the contract between an exporter (the
+<a href="/blender/">Blender add-on</a>) and a viewer (<a href="/babylon/">this package</a>). It is
+small on purpose, so other exporters and viewers can implement it.</p>
+<h2 id="where-the-svg-goes">Where the SVG goes</h2>
+<p>On a glTF <code>image</code>, under <code>extras.tosi_svg</code>:</p>
+<pre><code class="language-json" data-highlighted><span class="token punctuation">{</span>
+  <span class="token property">"images"</span><span class="token operator">:</span> <span class="token punctuation">[</span>
+    <span class="token punctuation">{</span>
+      <span class="token property">"name"</span><span class="token operator">:</span> <span class="token string">"label"</span><span class="token punctuation">,</span>
+      <span class="token property">"mimeType"</span><span class="token operator">:</span> <span class="token string">"image/png"</span><span class="token punctuation">,</span>
+      <span class="token property">"bufferView"</span><span class="token operator">:</span> <span class="token number">4</span><span class="token punctuation">,</span>
+      <span class="token property">"extras"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+        <span class="token property">"tosi_svg"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+          <span class="token property">"version"</span><span class="token operator">:</span> <span class="token number">1</span><span class="token punctuation">,</span>
+          <span class="token property">"svg"</span><span class="token operator">:</span> <span class="token string">"&lt;svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 512 256\">…&lt;/svg>"</span><span class="token punctuation">,</span>
+          <span class="token property">"width"</span><span class="token operator">:</span> <span class="token number">1024</span><span class="token punctuation">,</span>
+          <span class="token property">"height"</span><span class="token operator">:</span> <span class="token number">512</span>
+        <span class="token punctuation">}</span>
+      <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">]</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>field</th>
+<th>type</th>
+<th>meaning</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>version</code></td>
+<td>integer</td>
+<td><code>1</code>. A reader ignores a payload whose version it does not know.</td>
+</tr>
+<tr>
+<td><code>svg</code></td>
+<td>string</td>
+<td>The complete SVG document.</td>
+</tr>
+<tr>
+<td><code>width</code>, <code>height</code></td>
+<td>integer ≥ 1</td>
+<td>The <strong>authored resolution</strong>: the raster size the author previewed it at, and the texture&#39;s aspect ratio.</td>
+</tr>
+</tbody></table>
+<p>The image&#39;s <code>uri</code> or <code>bufferView</code> holds a <strong>placeholder</strong> PNG: a small
+thumbnail of the SVG, or a 1 × 1 transparent pixel. It exists so the file is
+valid glTF 2.0 and so viewers without support show something.</p>
+<h2 id="why-imageextras-and-not-a-vendor-extension">Why <code>image.extras</code>, and not a vendor extension</h2>
+<ul>
+<li><strong>On the image, not the texture or textureInfo:</strong> several textures and
+materials can share one image, so the SVG is stored once. The original
+plan put it on <code>textureInfo</code>, which repeats it per material slot.</li>
+<li><strong><code>extras</code>, not <code>extensions</code>:</strong> <code>extras</code> needs no <code>extensionsUsed</code> entry,
+draws no &quot;unsupported extension&quot; notice from validators, and Blender&#39;s
+exporter can write it from any image hook without registering an extension.
+The cost is that nothing declares the file uses it, so a reader has to look
+at each image. That&#39;s cheap.</li>
+</ul>
+<p>If this is ever proposed as a <code>KHR_</code>/<code>EXT_</code> extension, the payload moves to
+<code>images[i].extensions.&lt;NAME&gt;</code> unchanged.</p>
+<h2 id="reading-it">Reading it</h2>
+<ol>
+<li>For each image, read <code>extras.tosi_svg</code>. Treat it as absent unless
+<code>version</code> is known, <code>svg</code> is a string containing an <code>&lt;svg</code> element, and
+<code>width</code>/<code>height</code> are finite numbers ≥ 1.</li>
+<li>Choose a raster size. Keep the aspect ratio <code>width : height</code>, because the
+model&#39;s UVs were laid out against it. Scaling the authored size by a
+device- or quality-dependent factor and capping it at the GPU&#39;s maximum
+texture size is the expected policy.</li>
+<li>Rasterize the SVG so its <strong>viewport fills the raster exactly</strong>: UV (0, 0)
+to (1, 1) covers the SVG&#39;s viewport, the way it would cover a PNG export of
+the same SVG at that size.</li>
+<li>Use the raster wherever the glTF image is used, with the texture&#39;s own
+sampler, <code>texCoord</code> and texture transform, exactly as for a PNG.</li>
+<li>Ignore the placeholder.</li>
+</ol>
+<p>When rasterizing in a browser, set the root <code>&lt;svg&gt;</code>&#39;s <code>width</code>/<code>height</code> to the
+raster size first (adding a <code>viewBox</code> from the original size if it has
+none). A browser uploads an SVG image to WebGL at its intrinsic size, not
+the size you draw it. <a href="/size-svg/"><code>sizeSvg</code></a> does this.</p>
+<h2 id="security">Security</h2>
+<p>Treat <code>svg</code> as untrusted input, as you would any image in a file you did not
+author. Rasterized as an image (<code>&lt;img&gt;</code>, <code>createImageBitmap</code>, resvg), an SVG
+cannot run script or load external resources. <strong>Never insert it into the
+DOM as markup.</strong></p>
+<h2 id="writing-it">Writing it</h2>
+<ol>
+<li>Store the SVG text verbatim.</li>
+<li><code>width</code>/<code>height</code>: the size the author chose, aspect ratio matching the
+SVG&#39;s viewport.</li>
+<li>Replace the image&#39;s pixels with a placeholder PNG, set <code>mimeType</code> to
+<code>image/png</code>, and keep everything else about the image, texture and
+sampler unchanged.</li>
+</ol>
+
+  </article>
+  <nav class="doc-nav" aria-label="Documentation">
+  <ul>
+    <li><a class="doc-link" href="../">tosi-svg-gltf</a></li>
+    <li><a class="doc-link" href="../blender/">Blender add-on</a></li>
+    <li><a class="doc-link" href="../payload/">payload</a></li>
+    <li><a class="doc-link" href="../size-svg/">size-svg</a></li>
+    <li><a class="doc-link" href="../hydrate/">hydrate</a></li>
+    <li><a class="doc-link" href="../babylon/">babylon</a></li>
+    <li><a class="doc-link current" href="../format/" aria-current="page">The format</a></li>
+    <li><a class="doc-link" href="../CHANGELOG/">Changelog</a></li>
+  </ul>
+  </nav>
+  <ul class="doc-navbar">
+    <li><a href="/blender/" data-icon="download">Blender add-on</a></li>
+    <li><a href="https://3d.tosijs.net" data-icon="tosiXr">tosijs-3d</a></li>
+    <li><a href="https://github.com/tonioloewald/tosi-svg-gltf" data-icon="github">github</a></li>
+  </ul>
+  </tosi-doc-system>
+  <script type="module" src="../hydrate-9g3hpszc.js"></script>
+</body>
+</html>

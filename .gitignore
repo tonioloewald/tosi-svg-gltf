@@ -1,0 +1,38 @@
+node_modules/
+*.tsbuildinfo
+*.tgz
+.env
+.env.*
+*.key
+.DS_Store
+.metadata_never_index
+bun.lockb
+package-lock.json
+
+# Generated doc corpus
+demo/docs.json
+
+# TLS dev certs (bun tls regenerates them)
+tls/*.pem
+tls/*.csr
+.haltija/
+
+# Library build output: published from a clean build, never tracked.
+dist/
+
+# docs/ IS THE PUBLISHED SITE AND IS COMMITTED (GitHub Pages serves it from
+# main /docs). Source maps are the exception: nothing reads them there.
+docs/*.map
+docs/_chunks/*.map
+docs.last-good/
+llms.txt
+.browser-tests.json
+
+# Wheels are downloaded and sha256-verified by `bun blender wheels`; the built
+# extension zip in static/downloads/ carries them and IS committed.
+blender/tosi_svg/wheels/
+__pycache__/
+*.pyc
+
+# The shared publish workflow checks the practices repo out here.
+/.practices/

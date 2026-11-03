@@ -1,0 +1,85 @@
+{
+  "name": "tosi-svg-gltf",
+  "version": "0.1.0",
+  "description": "SVG textures inside glTF/GLB, rasterized by the viewer at the resolution it needs. A Blender extension writes them; a Babylon.js loader extension reads them.",
+  "license": "Apache-2.0",
+  "author": "Tonio Loewald",
+  "homepage": "https://svg-gltf.tosijs.net",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tonioloewald/tosi-svg-gltf.git"
+  },
+  "bugs": {
+    "url": "https://github.com/tonioloewald/tosi-svg-gltf/issues"
+  },
+  "keywords": [
+    "gltf",
+    "glb",
+    "svg",
+    "texture",
+    "babylonjs",
+    "blender",
+    "tosijs-3d"
+  ],
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./babylon": {
+      "types": "./dist/babylon.d.ts",
+      "default": "./dist/babylon.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "sideEffects": false,
+  "files": [
+    "dist",
+    "!dist/iife.js",
+    "!dist/iife.js.map",
+    "!dist/**/*.test.*",
+    "CHANGELOG.md",
+    "format.md"
+  ],
+  "scripts": {
+    "start": "bun format && bun bin/site.ts",
+    "build": "bun bin/site.ts --build",
+    "blender": "bun bin/blender.ts",
+    "test": "bun test",
+    "check": "bunx tsc -p tsconfig.json --noEmit && bun prettier --check . && bun test",
+    "typecheck": "bunx tsc -p tsconfig.json --noEmit",
+    "format": "bun prettier --write .",
+    "format:check": "bun prettier --check .",
+    "tls": "tosijs-dev-certs",
+    "deploy": "tosijs-deploy"
+  },
+  "peerDependencies": {
+    "@babylonjs/core": "^9.0.0",
+    "@babylonjs/loaders": "^9.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@babylonjs/core": {
+      "optional": true
+    },
+    "@babylonjs/loaders": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@babylonjs/core": "^9.33.2",
+    "@babylonjs/gui": "^9.33.2",
+    "@babylonjs/loaders": "^9.33.2",
+    "@babylonjs/materials": "^9.33.2",
+    "@types/bun": "latest",
+    "gltf-validator": "2.0.0-dev.3.10",
+    "happy-dom": "^21.0.4",
+    "prettier": "^2.8.8",
+    "tosijs": "^1.10.10",
+    "tosijs-3d": "^0.12.2",
+    "tosijs-ui": "^1.16.41",
+    "typescript": "^5.9.3"
+  }
+}
